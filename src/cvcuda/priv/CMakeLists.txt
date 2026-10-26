@@ -152,6 +152,12 @@ add_library(cvcuda_priv STATIC
     ${CV_CUDA_PRIV_FILES}
 )
 
+# Only FindHomography uses cuSOLVER and cuBLAS, and CV_CUDA_SRC_PATERN can leave it out
+set(CV_CUDA_PRIV_SOLVER_LIBS)
+if ("OpFindHomography.cu" IN_LIST CV_CUDA_PRIV_FILES)
+    set(CV_CUDA_PRIV_SOLVER_LIBS CUDA::cusolver_static CUDA::cublas_static CUDA::cublasLt_static)
+endif()
+
 target_link_libraries(cvcuda_priv
     PUBLIC
         nvcv_types
@@ -159,9 +165,7 @@ target_link_libraries(cvcuda_priv
         cvcuda_headers
         nvcv_util_sanitizer
         CUDA::cudart_static
-	    CUDA::cusolver_static
-        CUDA::cublas_static
-        CUDA::cublasLt_static
+        ${CV_CUDA_PRIV_SOLVER_LIBS}
         -lrt
 )
 
